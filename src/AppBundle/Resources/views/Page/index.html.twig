@@ -1,0 +1,26 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <h1>Musées</h1>
+
+    <nav class="list-group">
+        <a class="list-group-item" href="{{ path('musee_index') }}">Voir tous les musées</a>
+        <a class="list-group-item" href="{{ path('musee_index_par_arrondissement') }}">Voir les musées par arrondissements</a>
+
+        {% if is_granted('ROLE_USER') %}
+            <a class="list-group-item" href="{{ path('fos_user_security_logout') }}">
+                <i class="glyphicon glyphicon-log-out"></i>
+                Log-out
+            </a>
+        {% else %}
+            <a class="list-group-item" href="{{ path('fos_user_security_login') }}">
+                <i class="glyphicon glyphicon-log-in"></i>
+                Log-in
+            </a>
+            <a class="list-group-item" href="{{ path('fos_user_registration_register') }}">
+                <i class="glyphicon glyphicon-flash"></i>
+                Sign-up
+            </a>
+        {% endif %}
+    </nav>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>Musées</h1>
+
+    {% include 'AppBundle:Musee:pagination.html.twig' %}
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Adresse</th>
+                <th>Ville</th>
+                <th>Code Postal</th>
+                <th>Site Web</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for musee in musees %}
+            <tr data-url="{{ path('musee_show', {'id': musee.id}) }}">
+                <td>{{ musee.nom }}</td>
+                <td>{{ musee.adresse }}</td>
+                <td>{{ musee.ville }}</td>
+                <td>{{ musee.codePostal }}</td>
+                <td><a href="{{ musee.siteWeb }}">{{ musee.siteWeb }}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th>Nom</th>
+                <th>Adresse</th>
+                <th>Ville</th>
+                <th>Code Postal</th>
+                <th>Site Web</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    {% include 'AppBundle:Musee:pagination.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+    $(function() {
+        $('tbody tr').css('cursor', 'pointer');
+
+        $('tbody tr').click(function() {
+            document.location.href = $(this).data('url');
+        });
+    });
+    </script>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <h1>
+        {{ musee.nom }}
+        <small>{{ musee.codePostal }} {{ musee.ville }}</small>
+    </h1>
+
+    <a href="http://{{ musee.siteWeb }}">{{ musee.siteWeb }}</a>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('musee_edit', {'id': musee.id}) }}" class="btn btn-default">Edit</a>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+            <div id="map" style="height: 500px;"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+            <h3>Comments</h3>
+        </div>
+    </div>
+
+    {% for comment in musee.comments %}
+        <div class="row">
+            <div class="col-xs-8 col-xs-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a href="mailto:{{ comment.author.email }}">{{ comment.author.username }}</a>
+                        <span class="text-muted">
+                            posted
+                            <span class="datetime-from-now">{{ comment.insertedAt|date('c') }}</span>
+                        </span>
+
+                        <span class="pull-right" style="font-size:1.2em">
+                            {% if comment.grade > 0 %}
+                                {% for i in 1..comment.grade %}
+                                    <i class="glyphicon glyphicon-star"></i>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if comment.grade < 5 %}
+                                {% for i in comment.grade..4 %}
+                                    <i class="glyphicon glyphicon-star-empty"></i>
+                                {% endfor %}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="panel-body" style="text-align:justify">
+                        {{ comment.content }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if is_granted('ROLE_USER') %}
+        <div class="row">
+            <div class="col-xs-8 col-xs-offset-2">
+                <h3>Reply</h3>
+
+                {{ form_start(commentForm) }}
+                <div class="form-group">
+                    {{ form_widget(commentForm.grade) }}
+                </div>
+                <div class="form-group">
+                    {{ form_widget(commentForm.content) }}
+                </div>
+                {{ form_widget(commentForm.save) }}
+                {{ form_end(commentForm) }}
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+{% endblock %}
+
+{% block javascripts %}
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script>
+        $(function() {
+            $('.datetime-from-now').each(function() {
+                var m = moment($(this).html());
+                $(this).html(m.fromNow());
+            });
+        });
+    </script>
+
+    <script>
+        function draw_map(data) {
+            var map = L.map('map');
+            var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+            var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+            var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 14, attribution: osmAttrib});
+            map.setView(new L.LatLng(48.86, 2.34),12);
+            map.addLayer(osm);
+            var marker;
+            data.forEach(function(musee){
+                marker = L.marker([musee.lat, musee.lon]).addTo(map);
+                marker.bindPopup("<b>"+musee.nom+"</b>").openPopup();
+            });
+            if (marker) {
+                marker.openPopup();
+            }
+        }
+
+        var data = [
+            {
+                nom: "{{ musee.nom }}",
+                lat: "{{ musee.coordonnees[0] }}",
+                lon: "{{ musee.coordonnees[1] }}"
+            }
+        ];
+
+        draw_map(data);
+    </script>
+{% endblock %}

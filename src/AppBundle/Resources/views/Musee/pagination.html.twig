@@ -1,0 +1,23 @@
+<nav>
+    <ul class="pagination">
+    {% if page > 1 %}
+        <li><a href="{{ path('musee_index', {'page': page-1}) }}">«</a></li>
+    {% else %}
+        <li class="disabled"><a href="#">«</a></li>
+    {% endif %}
+
+    {% for i in 1..nr_of_pages %}
+        {% if page == i %}
+            <li class="active"><a href="#">{{ i }}</a></li>
+        {% else %}
+            <li><a href="{{ path('musee_index', {'page': i}) }}">{{ i }}</a></li>
+        {% endif %}
+    {% endfor %}
+
+    {% if page < nr_of_pages %}
+        <li><a href="{{ path('musee_index', {'page': page+1}) }}">»</a></li>
+    {% else %}
+        <li class="disabled"><a href="#">»</a></li>
+    {% endif %}
+    </ul>
+</nav>
